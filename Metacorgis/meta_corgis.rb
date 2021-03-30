@@ -104,17 +104,55 @@ end
 
 
 class MetaCorgiSnacks
+  TREATS = ['bone','kibble','treat']
+
+  def self.define_snack(name)
+    method_name = name.to_s
+
+    define_method(method_name) do
+      if TREATS.include?(method_name)
+        get_info = "get_#{method_name}_info"
+        get_tastiness ="get_#{method_name}_tastiness"
+
+        info = @snack_box.send(get_info, @box_id)
+        tastiness = @snack_box.send(get_tastiness, @box_id)
+
+        result = "#{method_name}: #{info}: #{tastiness} "
+        tastiness > 30 ? "* #{result}" : result
+      else
+        raise "Unidentified method call"
+      end
+    end
+  end
+
+  # define_snack(:bone)
+  # define_snack(:kibble)
+  # define_snack(:treat)
+
   def initialize(snack_box, box_id)
     @snack_box = snack_box
     @box_id = box_id
+    snack_box.methods.grep(/^get_(.*)_info$/) { MetaCorgiSnacks.define_snack $1 }
   end
 
-  def method_missing(name, *args)
-    # Your code goes here...
-  end
+  
+
+  # def method_missing(name, *args)
+  #   method_name = name.to_s
+  #   get_info = "get_#{method_name}_info"
+  #   get_tastiness ="get_#{method_name}_tastiness"
+
+  #   if TREATS.include?(method_name)
+  #     info = @snack_box.send(get_info, @box_id)
+  #     tastiness = @snack_box.send(get_tastiness, @box_id)
+  #     result = "Bone: #{info}: #{tastiness} "
+  #     tastiness > 30 ? "* #{result}" : result
+  #   else
+  #     raise "Unidentified method call"
+  #   end
+        
+  
 
 
-  def self.define_snack(name)
-    # Your code goes here...
-  end
+  
 end
